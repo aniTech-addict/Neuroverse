@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Plus, Eye, Edit, Award, AlertCircle } from 'lucide-react';
-import { mockPersonnel } from '../data/mockData';
 import { Personnel } from '../types/personnel';
 
 const PersonnelManagement: React.FC = () => {
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPersonnel, setSelectedPersonnel] = useState<Personnel | null>(null);
   const [filterBranch, setFilterBranch] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
 
-  const filteredPersonnel = mockPersonnel.filter(person => {
+  useEffect(() => {
+    const fetchPersonnel = async () => {
+      try {
+        const response = await axios.get<Personnel[]>('http://localhost:3001/api/personnel');
+        setPersonnel(response.data);
+      } catch (err) {
+        setError('Failed to fetch personnel data.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPersonnel();
+  }, []);
+
+  const filteredPersonnel = personnel.filter(person => {
     const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          person.serviceNumber.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesBranch = filterBranch === 'All' || person.branch === filterBranch;
@@ -34,6 +51,14 @@ const PersonnelManagement: React.FC = () => {
       default: return 'text-gray-600 bg-gray-100';
     }
   };
+
+  if (loading) {
+    return <div className="p-6 text-center text-gray-600">Loading personnel data...</div>;
+  }
+
+  if (error) {
+    return <div className="p-6 text-center text-red-600">Error: {error}</div>;
+  }
 
   return (
     <div className="p-6 space-y-6">

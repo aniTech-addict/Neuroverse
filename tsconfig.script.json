@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "moduleResolution": "nodenext",
+    "noImplicitAny": false,
+    "outDir": "./scripts/mock-data/dist"
+  },
+  "include": ["scripts/mock-data/generateMockData.ts"]
+}
